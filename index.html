@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b2f6b">
+<title>Meus Ganhos</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: direto, prático, feito pra usar com uma mão no carro
+   IDEA: placa de estrada azul com faixa amarela de pista
+   PICTURE: o próprio painel — valor grande, botões grandes, totais em destaque
+   COLOUR/TYPE: azul placa, branco, amarelo faixa; Archivo largo
+   LAYOUT: uma coluna, saudação, entrada, botões, totais, histórico */
+:root{color-scheme:light dark;
+ --bg:light-dark(#eef2f8,#08142b);--card:light-dark(#fff,#0f2245);--ink:light-dark(#0b1a33,#eef3ff);
+ --mut:light-dark(#5a6a85,#9fb0cf);--blue:#0b2f6b;--yel:#ffd200;--line:light-dark(#d6deea,#1e3561);
+ --ok:#11833e;--bad:#c8202f}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Archivo,system-ui,sans-serif;overflow-x:clip}
+.top{background:var(--blue);color:#fff;padding:22px 18px 26px;border-bottom:6px dashed var(--yel)}
+.top h1{margin:0;font-size:32px;line-height:1.05;font-stretch:115%;font-weight:800}
+.top h1 button{all:unset;cursor:pointer;border-bottom:2px dotted #fff8}
+.top p{margin:6px 0 0;font-size:17px;opacity:.9;text-transform:none}
+main{max-width:520px;margin:0 auto;padding:16px 14px 40px;display:grid;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+label.l{display:block;font-weight:700;margin-bottom:6px;color:var(--mut)}
+.val{display:flex;align-items:center;gap:8px;border:2px solid var(--line);border-radius:12px;padding:0 12px;background:var(--bg)}
+.val:focus-within{border-color:var(--yel);box-shadow:0 0 0 3px #ffd20055}
+.val span{flex:none;font-weight:800;font-size:22px;color:var(--mut);white-space:nowrap}
+.val input{flex:1 1 auto;width:100%;border:0;outline:0;background:transparent;color:var(--ink);font:800 34px Archivo,system-ui,sans-serif;font-stretch:110%;padding:10px 0;margin:0}
+.row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+button{font:inherit;cursor:pointer;min-height:48px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-weight:700}
+button:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
+.q{font-size:17px}.q.clr{color:var(--mut);font-weight:600}
+.orig{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.orig button[aria-pressed=true]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.act{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-top:12px}
+.add{background:var(--ok);border-color:var(--ok);color:#fff;font-size:20px;min-height:60px;font-stretch:115%}
+.rem{background:transparent;border-color:var(--bad);color:var(--bad);font-size:18px;min-height:60px}
+.ret{margin-top:14px;padding:12px;border:2px solid var(--bad);border-radius:12px}
+.ret textarea{min-height:64px;font:16px Archivo,system-ui,sans-serif}
+.rem.fill{background:var(--bad);color:#fff;font-size:16px}
+li .t em{display:block;font-style:normal;color:var(--ink);overflow-wrap:anywhere}
+.pdf{width:100%;margin-top:12px;background:var(--blue);border-color:var(--blue);color:#fff;font-size:17px;min-height:54px}
+.msg{min-height:22px;margin-top:8px;font-weight:700;text-align:center}
+.tot{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.box small{display:block;color:var(--mut);font-weight:600;font-size:14px}
+.box b{display:block;font-size:clamp(22px,7vw,30px);font-stretch:110%;white-space:nowrap;margin-top:2px}
+.box.hi{background:var(--blue);color:#fff;border-color:var(--blue);grid-column:1/-1}
+.box.hi small{color:#c9d6f2}.box.hi b{font-size:clamp(32px,11vw,46px);color:#fff}
+.box.hi b.pos{color:#3ee07f}.box.hi b.neg{color:#ff6b78}
+.split{font-size:14px;color:var(--mut);margin-top:4px}.box.hi .split{color:#c9d6f2}
+h2{font-size:19px;margin:0 0 8px}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+li:first-child{border-top:0}
+li .h{color:var(--mut);font-size:14px;width:46px;flex:none}
+li .t{flex:1;font-size:14px;color:var(--mut)}
+li .v{font-weight:800;white-space:nowrap}
+li .v.neg{color:var(--bad)}
+li button{min-height:40px;min-width:44px;padding:0 10px;font-size:14px;border-color:transparent;color:var(--mut)}
+li button.sure{color:#fff;background:var(--bad)}
+.empty{color:var(--mut);text-align:center;padding:10px 0}
+details summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+textarea{width:100%;min-height:90px;font:14px monospace;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);padding:8px}
+.bk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0}
+.bk button{font-size:14px}
+@media(prefers-reduced-motion:no-preference){.pop{animation:pop .35s ease}@keyframes pop{50%{transform:scale(1.06)}}}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1 id="greet">Bom dia, <button id="nome" title="Toque para mudar o nome">Carlos</button>!</h1>
+  <p id="hoje"></p>
+</header>
+<main>
+  <section class="card">
+    <label class="l" for="valor">Valor da corrida</label>
+    <div class="val"><span>R$</span><input id="valor" inputmode="decimal" placeholder="0,00" autocomplete="off"></div>
+    <div class="row">
+      <button class="q" data-q="1">+R$ 1</button>
+      <button class="q" data-q="5">+R$ 5</button>
+      <button class="q" data-q="10">+R$ 10</button>
+      <button class="q clr" id="limpar">Limpar</button>
+    </div>
+    <div class="orig" role="group" aria-label="Origem da corrida">
+      <button data-o="app" aria-pressed="true">Aplicativo</button>
+      <button data-o="part" aria-pressed="false">Particular</button>
+    </div>
+    <div class="act">
+      <button class="add" id="add">ADICIONAR</button>
+      <button class="rem" id="rem">RETIRAR</button>
+    </div>
+    <div class="ret" id="retBox" hidden>
+      <label class="l" for="retTxt">Motivo da retirada</label>
+      <textarea id="retTxt" rows="2" placeholder="Ex.: combustível, lanche, corrida lançada errada..."></textarea>
+      <div class="act">
+        <button class="rem fill" id="retOk">CONFIRMAR RETIRADA</button>
+        <button id="retNo">Cancelar</button>
+      </div>
+    </div>
+    <div class="msg" id="msg" aria-live="polite"></div>
+  </section>
+
+  <section class="tot">
+    <div class="box hi"><small>Subtotal do dia</small><b id="sDia">R$ 0,00</b><div class="split" id="spDia"></div></div>
+    <div class="box"><small>Total mensal</small><b id="sMes">R$ 0,00</b></div>
+    <div class="box"><small>Média por corrida (mês)</small><b id="sMed">R$ 0,00</b></div>
+    <div class="box"><small>Corridas do dia</small><b id="cDia">0</b></div>
+    <div class="box"><small>Corridas do mês</small><b id="cMes">0</b></div>
+  </section>
+
+  <section class="card">
+    <h2>Lançamentos de hoje</h2>
+    <ul id="lista"></ul>
+    <button class="pdf" id="pdf">Baixar resumo do dia em PDF</button>
+    <div class="msg" id="pMsg"></div>
+  </section>
+
+  <section class="card">
+    <h2 id="tMes">Dias do mês</h2>
+    <ul id="dias"></ul>
+  </section>
+
+  <section class="card">
+    <details>
+      <summary>Backup dos dados</summary>
+      <p style="margin:4px 0;color:var(--mut);font-size:14px">Os dados ficam só neste celular. Faça um backup de vez em quando e guarde no WhatsApp ou e-mail.</p>
+      <div class="bk">
+        <button id="bCopy">Copiar</button>
+        <button id="bDown">Baixar</button>
+        <button id="bRest">Restaurar</button>
+      </div>
+      <textarea id="bTxt" placeholder="Cole aqui um backup para restaurar"></textarea>
+      <div class="msg" id="bMsg"></div>
+    </details>
+  </section>
+</main>
+
+<script src="jspdf.umd.min.js"></script>
+<script>
+{
+const KEY='ganhos_motorista_v1';
+const $=id=>document.getElementById(id);
+let db={nome:'Carlos',itens:[]};
+try{const s=localStorage.getItem(KEY);if(s)db=Object.assign(db,JSON.parse(s))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
+let origem='app';
+
+const brl=c=>(c<0?'-':'')+'R$ '+(Math.abs(c)/100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pad=n=>String(n).padStart(2,'0');
+const dKey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{s=String(s).replace(/[^\d,.]/g,'');if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');const n=parseFloat(s);return isNaN(n)?0:Math.round(n*100)};
+const fmtIn=c=>(c/100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const DIAS=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+
+function flash(el,t,cor){el.textContent=t;el.style.color=cor||'';clearTimeout(el._t);el._t=setTimeout(()=>el.textContent='',2500)}
+
+function header(){
+  const n=new Date(),h=n.getHours();
+  const s=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
+  $('greet').firstChild.textContent=s+', ';
+  if($('nome'))$('nome').textContent=db.nome;
+  $('hoje').textContent=pad(n.getDate())+'/'+pad(n.getMonth()+1)+'/'+n.getFullYear()+' · '+DIAS[n.getDay()];
+}
+
+function render(){
+  header();
+  const n=new Date(),hoje=dKey(n),mes=hoje.slice(0,7);
+  const dia=db.itens.filter(i=>i.d===hoje),doMes=db.itens.filter(i=>i.d.startsWith(mes));
+  const sum=a=>a.reduce((t,i)=>t+i.v,0);
+  const corr=a=>a.filter(i=>i.v>0).length;
+  const sMes=sum(doMes),cMes=corr(doMes);
+  const sd=sum(dia);
+  $('sDia').textContent=brl(sd);
+  $('sDia').classList.toggle('pos',sd>0);
+  $('sDia').classList.toggle('neg',sd<0);
+  const ap=sum(dia.filter(i=>i.o==='app')),pa=sum(dia.filter(i=>i.o==='part'));
+  $('spDia').textContent='Aplicativo '+brl(ap)+' · Particular '+brl(pa);
+  $('sMes').textContent=brl(sMes);
+  $('cDia').textContent=corr(dia);
+  $('cMes').textContent=cMes;
+  $('sMed').textContent=brl(cMes?Math.round(sMes/cMes):0);
+
+  $('lista').innerHTML=dia.length?dia.slice().reverse().map(i=>{
+    const t=new Date(i.ts);
+    const tipo=i.v<0?'Retirada':(i.o==='part'?'Particular':'Aplicativo');
+    const desc=i.desc?`<em>${esc(i.desc)}</em>`:'';
+    return `<li><span class="h">${pad(t.getHours())}:${pad(t.getMinutes())}</span><span class="t">${tipo}${desc}</span><span class="v ${i.v<0?'neg':''}">${brl(i.v)}</span><button data-del="${i.id}" aria-label="Apagar">Apagar</button></li>`;
+  }).join(''):'<li class="empty">Nenhuma corrida ainda hoje. Boa sorte!</li>';
+
+  const nomeMes=n.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  $('tMes').textContent='Dias de '+nomeMes;
+  const porDia={};doMes.forEach(i=>{(porDia[i.d]=porDia[i.d]||[]).push(i)});
+  const ks=Object.keys(porDia).sort().reverse();
+  $('dias').innerHTML=ks.length?ks.map(k=>{
+    const d=new Date(k+'T12:00');const a=porDia[k];
+    return `<li><span class="h">${k.slice(8)}/${k.slice(5,7)}</span><span class="t">${DIAS[d.getDay()].split('-')[0]} · ${corr(a)} corrida${corr(a)===1?'':'s'}</span><span class="v">${brl(sum(a))}</span></li>`;
+  }).join(''):'<li class="empty">Sem lançamentos neste mês.</li>';
+}
+
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function lancar(sinal,desc){
+  const c=parse($('valor').value);
+  if(c<=0){flash($('msg'),'Digite um valor primeiro','var(--bad)');$('valor').focus();return}
+  const n=new Date();
+  const it={id:n.getTime()+''+Math.random().toString(36).slice(2,6),ts:n.getTime(),d:dKey(n),v:sinal*c,o:origem};
+  if(desc)it.desc=desc;
+  db.itens.push(it);
+  save();$('valor').value='';
+  flash($('msg'),(sinal>0?'Adicionado ':'Retirado ')+brl(c),sinal>0?'var(--ok)':'var(--bad)');
+  render();
+  const b=$('sDia');b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');
+}
+
+document.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>{
+  $('valor').value=fmtIn(parse($('valor').value)+Number(b.dataset.q)*100);
+}));
+$('limpar').addEventListener('click',()=>{$('valor').value=''});
+document.querySelectorAll('[data-o]').forEach(b=>b.addEventListener('click',()=>{
+  origem=b.dataset.o;
+  document.querySelectorAll('[data-o]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+}));
+$('add').addEventListener('click',()=>lancar(1));
+const fecharRet=()=>{$('retBox').hidden=true;$('retTxt').value=''};
+$('rem').addEventListener('click',()=>{
+  if(parse($('valor').value)<=0){flash($('msg'),'Digite um valor primeiro','var(--bad)');$('valor').focus();return}
+  $('retBox').hidden=false;$('retTxt').focus();
+});
+$('retOk').addEventListener('click',()=>{lancar(-1,$('retTxt').value.trim());fecharRet()});
+$('retNo').addEventListener('click',fecharRet);
+$('valor').addEventListener('keydown',e=>{if(e.key==='Enter')lancar(1)});
+
+$('lista').addEventListener('click',e=>{
+  const b=e.target.closest('[data-del]');if(!b)return;
+  if(!b.classList.contains('sure')){b.classList.add('sure');b.textContent='Certeza?';setTimeout(()=>{b.classList.remove('sure');b.textContent='Apagar'},3000);return}
+  db.itens=db.itens.filter(i=>i.id!==b.dataset.del);save();render();
+});
+
+function editNome(){
+  const inp=document.createElement('input');
+  inp.value=db.nome;inp.style.cssText='font:inherit;width:8em;border-radius:8px;border:0;padding:0 6px';
+  $('nome').replaceWith(inp);inp.focus();inp.select();
+  const ok=()=>{db.nome=inp.value.trim()||db.nome;save();const b=document.createElement('button');b.id='nome';b.textContent=db.nome;inp.replaceWith(b);b.addEventListener('click',editNome);render()};
+  inp.addEventListener('blur',ok,{once:true});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')inp.blur()});
+}
+$('nome').addEventListener('click',editNome);
+
+const backup=()=>JSON.stringify(db);
+$('bCopy').addEventListener('click',async()=>{
+  $('bTxt').value=backup();
+  try{await navigator.clipboard.writeText(backup());flash($('bMsg'),'Backup copiado! Cole no WhatsApp ou e-mail.','var(--ok)')}
+  catch(e){$('bTxt').select();flash($('bMsg'),'Texto selecionado: copie manualmente.')}
+});
+$('bDown').addEventListener('click',()=>{
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([backup()],{type:'application/json'}));
+  a.download='ganhos-backup-'+dKey(new Date())+'.json';document.body.appendChild(a);a.click();a.remove();
+  flash($('bMsg'),'Arquivo baixado.','var(--ok)')}catch(e){flash($('bMsg'),'Não deu pra baixar aqui; use Copiar.','var(--bad)')}
+});
+$('bRest').addEventListener('click',()=>{
+  try{const d=JSON.parse($('bTxt').value);if(!Array.isArray(d.itens))throw 0;db=Object.assign({nome:'Carlos',itens:[]},d);save();render();$('bTxt').value='';flash($('bMsg'),'Backup restaurado!','var(--ok)')}
+  catch(e){flash($('bMsg'),'Backup inválido. Cole o texto completo.','var(--bad)')}
+});
+
+function gerarPDF(){
+  if(!window.jspdf){flash($('pMsg'),'Não foi possível gerar o PDF agora.','var(--bad)');return}
+  const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});
+  const n=new Date(),hoje=dKey(n),mes=hoje.slice(0,7);
+  const dia=db.itens.filter(i=>i.d===hoje).sort((a,b)=>a.ts-b.ts),doMes=db.itens.filter(i=>i.d.startsWith(mes));
+  const sum=a=>a.reduce((t,i)=>t+i.v,0),corr=a=>a.filter(i=>i.v>0).length;
+  const ent=dia.filter(i=>i.v>0),ret=dia.filter(i=>i.v<0);
+  const ap=sum(ent.filter(i=>i.o==='app')),pa=sum(ent.filter(i=>i.o==='part'));
+  const W=210,M=16;let y=0;
+  doc.setFillColor(11,47,107);doc.rect(0,0,W,34,'F');
+  doc.setFillColor(255,210,0);for(let x=0;x<W;x+=12)doc.rect(x,34,6,2,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(20);
+  doc.text('Resumo do dia - '+db.nome,M,16);
+  doc.setFont('helvetica','normal');doc.setFontSize(12);
+  doc.text(pad(n.getDate())+'/'+pad(n.getMonth()+1)+'/'+n.getFullYear()+' - '+DIAS[n.getDay()],M,25);
+  y=48;doc.setTextColor(11,26,51);
+  const linha=(rot,val,neg,neg2)=>{doc.setFont('helvetica','normal');doc.setFontSize(12);doc.text(rot,M,y);
+    doc.setFont('helvetica','bold');if(neg)doc.setTextColor(200,32,47);else if(neg2)doc.setTextColor(17,131,62);
+    doc.text(val,W-M,y,{align:'right'});doc.setTextColor(11,26,51);y+=8};
+  linha('Corridas pelo aplicativo ('+corr(ent.filter(i=>i.o==='app'))+')',brl(ap));
+  linha('Corridas particulares ('+corr(ent.filter(i=>i.o==='part'))+')',brl(pa));
+  linha('Total de entradas ('+ent.length+' corridas)',brl(ap+pa));
+  linha('Retiradas ('+ret.length+')',brl(sum(ret)),ret.length>0);
+  doc.setDrawColor(214,222,234);doc.line(M,y-3,W-M,y-3);y+=3;
+  const sd=sum(dia);doc.setFontSize(15);doc.setFont('helvetica','bold');doc.text('Subtotal do dia',M,y);
+  if(sd<0)doc.setTextColor(200,32,47);else if(sd>0)doc.setTextColor(17,131,62);
+  doc.text(brl(sd),W-M,y,{align:'right'});doc.setTextColor(11,26,51);y+=8;
+  doc.setFontSize(11);doc.setFont('helvetica','normal');
+  doc.text('Média por corrida no dia: '+brl(corr(dia)?Math.round((ap+pa)/corr(dia)):0),M,y);y+=12;
+  // tabela
+  doc.setFont('helvetica','bold');doc.setFontSize(13);doc.text('Lançamentos',M,y);y+=6;
+  doc.setFillColor(238,242,248);doc.rect(M,y-4.5,W-2*M,7,'F');doc.setFontSize(10);
+  doc.text('Hora',M+2,y);doc.text('Tipo',M+20,y);doc.text('Motivo',M+52,y);doc.text('Valor',W-M-2,y,{align:'right'});y+=7;
+  doc.setFont('helvetica','normal');
+  if(!dia.length){doc.text('Nenhum lançamento hoje.',M+2,y);y+=7}
+  dia.forEach(i=>{
+    const t=new Date(i.ts);const mot=doc.splitTextToSize(i.desc||'-',W-2*M-52-30);
+    const h=Math.max(1,mot.length)*5+2;
+    if(y+h>280){doc.addPage();y=20}
+    doc.text(pad(t.getHours())+':'+pad(t.getMinutes()),M+2,y);
+    doc.text(i.v<0?'Retirada':(i.o==='part'?'Particular':'Aplicativo'),M+20,y);
+    doc.text(mot,M+52,y);
+    if(i.v<0)doc.setTextColor(200,32,47);doc.text(brl(i.v),W-M-2,y,{align:'right'});doc.setTextColor(11,26,51);
+    y+=h;doc.setDrawColor(230,234,242);doc.line(M,y-4,W-M,y-4);
+  });
+  y+=6;if(y>265){doc.addPage();y=20}
+  doc.setFont('helvetica','bold');doc.setFontSize(13);doc.text('Acumulado do mês',M,y);y+=8;
+  linha('Total mensal',brl(sum(doMes)),sum(doMes)<0);
+  linha('Corridas do mês',String(corr(doMes)));
+  doc.setFontSize(9);doc.setTextColor(90,106,133);doc.setFont('helvetica','normal');
+  doc.text('Gerado em '+pad(n.getDate())+'/'+pad(n.getMonth()+1)+'/'+n.getFullYear()+' às '+pad(n.getHours())+':'+pad(n.getMinutes())+' - Meus Ganhos',M,290);
+  try{doc.save('resumo-'+hoje+'.pdf');flash($('pMsg'),'PDF baixado! Veja em Downloads.','var(--ok)')}
+  catch(e){flash($('pMsg'),'Não foi possível baixar o PDF.','var(--bad)')}
+}
+$('pdf').addEventListener('click',gerarPDF);
+
+render();
+setInterval(header,60000);
+if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+}
+</script>
+</body>
+</html>

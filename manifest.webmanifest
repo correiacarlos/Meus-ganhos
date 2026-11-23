@@ -1,0 +1,16 @@
+{
+  "name": "Meus Ganhos",
+  "short_name": "Ganhos",
+  "description": "Controle de ganhos diários do motorista",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b2f6b",
+  "theme_color": "#0b2f6b",
+  "lang": "pt-BR",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
