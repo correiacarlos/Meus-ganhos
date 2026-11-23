@@ -27,6 +27,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Archivo,syste
 .top h1{margin:0;font-size:32px;line-height:1.05;font-stretch:115%;font-weight:800}
 .top h1 button{all:unset;cursor:pointer;border-bottom:2px dotted #fff8}
 .top p{margin:6px 0 0;font-size:17px;opacity:.9;text-transform:none}
+.boas{position:fixed;inset:0;z-index:9;background:var(--blue);display:grid;place-items:center;padding:20px}
+.boas[hidden]{display:none}
+.boasc{background:var(--card);color:var(--ink);border-radius:20px;padding:24px 20px;width:100%;max-width:400px;display:grid;gap:12px;text-align:center}
+.boasc img{margin:0 auto;border-radius:20px}.boasc h2{margin:0;font-size:24px}.boasc p{margin:0;color:var(--mut)}
+.boasc label{text-align:left;margin:0}
+.boasc input{font:700 20px Archivo,system-ui,sans-serif;padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
 main{max-width:520px;margin:0 auto;padding:16px 14px 40px;display:grid;gap:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
 label.l{display:block;font-weight:700;margin-bottom:6px;color:var(--mut)}
@@ -76,6 +82,16 @@ textarea{width:100%;min-height:90px;font:14px monospace;border-radius:10px;borde
 </style>
 </head>
 <body>
+<div class="boas" id="boas" hidden>
+  <form class="boasc" id="boasF">
+    <img src="icon-192.png" alt="" width="84" height="84">
+    <h2>Bem-vindo ao Meus Ganhos!</h2>
+    <p>Controle suas corridas do aplicativo e particulares. Seus dados ficam só neste celular.</p>
+    <label class="l" for="boasNome">Qual é o seu nome?</label>
+    <input id="boasNome" autocomplete="given-name" placeholder="Seu nome" required>
+    <button class="add" type="submit">COMEÇAR</button>
+  </form>
+</div>
 <header class="top">
   <h1 id="greet">Bom dia, <button id="nome" title="Toque para mudar o nome">Carlos</button>!</h1>
   <p id="hoje"></p>
@@ -149,7 +165,7 @@ textarea{width:100%;min-height:90px;font:14px monospace;border-radius:10px;borde
 {
 const KEY='ganhos_motorista_v1';
 const $=id=>document.getElementById(id);
-let db={nome:'Carlos',itens:[]};
+let db={nome:'',itens:[]};
 try{const s=localStorage.getItem(KEY);if(s)db=Object.assign(db,JSON.parse(s))}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
 let origem='app';
@@ -166,7 +182,7 @@ function flash(el,t,cor){el.textContent=t;el.style.color=cor||'';clearTimeout(el
 function header(){
   const n=new Date(),h=n.getHours();
   const s=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
-  $('greet').firstChild.textContent=s+', ';
+  $('greet').firstChild.textContent=db.nome?s+', ':s;
   if($('nome'))$('nome').textContent=db.nome;
   $('hoje').textContent=pad(n.getDate())+'/'+pad(n.getMonth()+1)+'/'+n.getFullYear()+' · '+DIAS[n.getDay()];
 }
@@ -266,7 +282,7 @@ $('bDown').addEventListener('click',()=>{
   flash($('bMsg'),'Arquivo baixado.','var(--ok)')}catch(e){flash($('bMsg'),'Não deu pra baixar aqui; use Copiar.','var(--bad)')}
 });
 $('bRest').addEventListener('click',()=>{
-  try{const d=JSON.parse($('bTxt').value);if(!Array.isArray(d.itens))throw 0;db=Object.assign({nome:'Carlos',itens:[]},d);save();render();$('bTxt').value='';flash($('bMsg'),'Backup restaurado!','var(--ok)')}
+  try{const d=JSON.parse($('bTxt').value);if(!Array.isArray(d.itens))throw 0;db=Object.assign({nome:'',itens:[]},d);save();render();$('bTxt').value='';flash($('bMsg'),'Backup restaurado!','var(--ok)')}
   catch(e){flash($('bMsg'),'Backup inválido. Cole o texto completo.','var(--bad)')}
 });
 
@@ -326,6 +342,8 @@ function gerarPDF(){
 }
 $('pdf').addEventListener('click',gerarPDF);
 
+if(!db.nome){$('boas').hidden=false;setTimeout(()=>$('boasNome').focus(),300)}
+$('boasF').addEventListener('submit',e=>{e.preventDefault();const v=$('boasNome').value.trim();if(!v)return;db.nome=v;save();$('boas').hidden=true;render()});
 render();
 setInterval(header,60000);
 if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{})}
